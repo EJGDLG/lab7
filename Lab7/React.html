@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Blog Post List</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@babel/standalone@7.16.0/babel.min.js"></script>
+
+</head>
+<body bgcolor="#C0D9D9 ">
+    <div id="root"></div>
+    <script type="text/babel"> 
+      // Importa las funciones necesarias de Firebase
+      const { initializeApp } = firebase;
+      const { useState, useEffect } = React;
+      const { getDatabase, ref, onValue } = firebase.database;
+
+      //const firebaseConfig = {
+  apiKey: "AIzaSyAV7OMtVyyDjdf8DJ0MWgca_2ZiIy6RtYY",
+authDomain: "uvgcarros.firebaseapp.com", 
+  projectId: "uvgcarros",
+  storageBucket: "uvgcarros.appspot.com",
+  messagingSenderId: "941159842548",
+  appId: "1:941159842548:web:f903f79f55f4902a3354a1"
+};
+
+
+      // Inicializa Firebase
+      const app = initializeApp(firebaseConfig);
+
+      // Componente PostList para mostrar la lista de publicaciones
+      const PostList = () => {
+        // Estado para almacenar las publicaciones obtenidas de Firebase
+        const [posts, setPosts] = useState([]);
+
+        // Obtiene las publicaciones de Firebase cuando el componente se monta
+        useEffect(() => {
+          // Referencia a la ubicación de las publicaciones en la base de datos de Firebase
+          const postsRef = ref(getDatabase(), 'posts');
+
+          // Escucha cambios en las publicaciones en la base de datos
+          onValue(postsRef, (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+              // Convierte los datos de Firebase en un array de publicaciones y actualiza el estado
+              const postsArray = Object.keys(data).map(key => ({ id: key, ...data[key] }));
+              setPosts(postsArray);
+            } else {
+              // Si no hay datos en Firebase, establece el estado de las publicaciones en un array vacío
+              setPosts([]);
+            }
+          });
+
+          // Detiene la escucha de cambios cuando el componente se desmonta
+          return () => {
+            // No necesitas detener la escucha en Firebase, ya que onValue se maneja automáticamente
+          };
+        }, []); // Este efecto se ejecuta solo una vez al montar el componente
+
+        return (
+          <div>
+            <h1>Blog Posts</h1>
+            <ul>
+              {posts.map(post => (
+                <li key={post.id}>
+                  <h2>{post.title}</h2>
+                  <p>{post.body}</p>
+                </li>
+              ))}
+            </ul>
+          </div>
+        );
+      };
+
+      // Renderiza el componente PostList en el elemento con id "root"
+      ReactDOM.render(<PostList />, document.getElementById('root'));
+    </script>
+</body>
+</html>
