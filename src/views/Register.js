@@ -47,10 +47,7 @@ const Register = () => {
           required
         />
         {error && <div style={{ color: 'red' }}>{error}</div>}
-        <select value={role} onChange={(e) => setRole(e.target.value)}>
-          <option value="student">Student</option>
-          <option value="tutor">Tutor</option>
-        </select>
+        
         <button type="submit">Register</button>
       </form>
     </div>
